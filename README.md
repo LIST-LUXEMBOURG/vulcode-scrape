@@ -1,6 +1,6 @@
 # vulcode-scrape
 
-This project automatically collects source code with software vulnerabilityies from bitbucket, GitHub, and gitlab. The vulnerabilty information is sourced from the Common Vulnerabilities and Exposures (CVE) records in the public U.S. National Vulnerability Database (NVD). 
+This project automatically collects source code with software vulnerabilities from Bitbucket, GitHub, and GitLab. The vulnerability information is sourced from the Common Vulnerabilities and Exposures (CVE) records in the public U.S. National Vulnerability Database (NVD). 
 
 
 ## ⚙️ Prerequisites
@@ -78,7 +78,7 @@ python main.py \
     --end_year <end_year>
 ```
 
-#### 🔥 Example. The following command will collect vulnerabile code with CVEs recorded from 2021 to 2025.
+#### 🔥 Example: The following command will collect vulnerable code with CVEs recorded from 2021 to 2025.
 
 ```bash
 python main.py --database_dir Data --ini_year 2021 --end_year 2025
@@ -90,7 +90,7 @@ python main.py --database_dir Data --ini_year 2021 --end_year 2025
 
 [NVD data feeds](https://nvd.nist.gov/vuln/data-feeds): where we get the CVE records.
 
-[CWE](https://cwe.mitre.org/): where we obtain the CWE information
+[CWE](https://cwe.mitre.org/): where we obtain the CWE information.
 
 
 
