@@ -12,6 +12,9 @@ from github.GithubException import BadCredentialsException
 from collect_commits import extract_project_links, extract_commits
 from database import table_exists, fetch_one_query
 from logger import get_logger
+import signal
+
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
 
 logger = get_logger(__name__)
@@ -27,6 +30,10 @@ REPO_COLUMNS = [
     'repo_language',
     'owner',
 ]
+
+
+def timeout_handler(signum, frame):
+    raise TimeoutError("Exceeded 10 minutes!")
 
 
 def store_tables(args, df_fixes: pd.DataFrame) -> None:
@@ -61,12 +68,19 @@ def store_tables(args, df_fixes: pd.DataFrame) -> None:
         df_single_repo = df_fixes[df_fixes.repo_url == repo_url]
         hashes = list(df_single_repo.hash.unique())
         
-        # Extract commits at different granularity levels
-        df_commit, df_file, df_method = extract_commits(args, repo_url, hashes)
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(1800)
         
-        if df_commit is not None:
-            _store_commit_data(args, df_commit, df_file, df_method)
-            save_repo_meta(args, repo_url)
+        try:
+            df_commit, df_file, df_method = extract_commits(args, repo_url, hashes)
+            if df_commit is not None:
+                _store_commit_data(args, df_commit, df_file, df_method)
+                save_repo_meta(args, repo_url)
+        except TimeoutError:
+            logger.warning(f"Timeout: {repo_url}, skip")
+            continue
+        finally:
+            signal.alarm(0)  # reset timer
 
 
 def _store_commit_data(
