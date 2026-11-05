@@ -156,44 +156,48 @@ def _add_nvd_specific_cwes(rows: List[Dict[str, Any]]) -> None:
     rows.extend(nvd_cwes)
     
 
+
 def extract_cwe_info(data):
     """
-    Extract CWE ID and source from vulnerability data.
-    Priority: Primary > Secondary > any other type
-    
-    Args:
-        data: List of dictionaries containing source, type, and description
-        
+    Extract all CWE IDs and their sources from vulnerability data.
+    Priority: Primary > Secondary > any other type.
+
     Returns:
-        tuple: (cwe_id, source) or (None, None) if not found
+        tuple: (list of CWE IDs, list of corresponding sources)
     """
     if not data:
-        return None, None
-    
-    # Define priority order
+        return ['unknown'], ['unknown']
+
     priority_order = ['Primary', 'Secondary']
-    
-    # First, try to find by priority order
-    for priority_type in priority_order:
+
+    cwe_ids = []
+    sources = []
+
+    # Process Primary, Secondary, then other classifications
+    for priority_type in priority_order + [None]:
         for item in data:
-            if item.get('type') == priority_type:
-                descriptions = item.get('description', [])
-                if descriptions and len(descriptions) > 0:
-                    cwe_id = descriptions[0].get('value')
-                    source = item.get('source')
-                    if cwe_id:
-                        return cwe_id, source
-    
-    # If no Primary or Secondary found, use the first available
-    for item in data:
-        descriptions = item.get('description', [])
-        if descriptions and len(descriptions) > 0:
-            cwe_id = descriptions[0].get('value')
-            source = item.get('source')
-            if cwe_id:
-                return cwe_id, source
-    
-    return 'unknown', 'unknown'
+
+            # Skip items already handled by higher-priority categories
+            if priority_type is None:
+                if item.get('type') in priority_order:
+                    continue
+            elif item.get('type') != priority_type:
+                continue
+
+            descriptions = item.get('description', [])
+
+            for description in descriptions:
+                cwe_id = description.get('value')
+
+                if cwe_id:
+                    cwe_ids.append(cwe_id)
+                    sources.append(item.get('source'))
+
+    if not cwe_ids:
+        return ['unknown'], ['unknown']
+
+    return cwe_ids, sources
+
 
 
 def add_cwe_class(weaknesses_col) -> List[List[str]]:

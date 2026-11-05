@@ -78,7 +78,7 @@ python main.py \
     --end_year <end_year>
 ```
 
-#### 🔥 Example: The following command will collect vulnerable code with CVEs recorded from 2021 to 2025.
+#### 🔥 Example. The following command will collect vulnerable code with CVEs recorded from 2021 to 2025.
 
 ```bash
 python main.py --database_dir Data --ini_year 2021 --end_year 2025
@@ -92,7 +92,7 @@ python main.py --database_dir Data --ini_year 2021 --end_year 2025
 
 [NVD data feeds](https://nvd.nist.gov/vuln/data-feeds): where we get the CVE records.
 
-[CWE](https://cwe.mitre.org/): where we obtain the CWE information.
+[CWE](https://cwe.mitre.org/):where we obtain the CWE information.
 
 
 ---
